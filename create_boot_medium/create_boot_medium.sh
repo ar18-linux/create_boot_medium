@@ -48,10 +48,18 @@ echo 'type=83' | echo "${ar18_sudo_password}" | sudo -Sk sfdisk "/dev/${ar18_dev
 set -e
 echo "${ar18_sudo_password}" | sudo -Sk mkfs.ext4 "/dev/${ar18_device}1"
 
-echo "${ar18_sudo_password}" | sudo -Sk  mkdir -p /mnt/ar18_usb
-echo "${ar18_sudo_password}" | sudo -Sk  mount "/dev/${ar18_device}1" /mnt/ar18_usb
-echo "${ar18_sudo_password}" | sudo -Sk  grub-install --target=i386-pc --debug --boot-directory=/mnt/ar18_usb/boot "/dev/${ar18_device}"
-echo "${ar18_sudo_password}" | sudo -Sk  grub-mkconfig -o /mnt/ar18_usb/boot/grub/grub.cfg
+echo "${ar18_sudo_password}" | sudo -Sk mkdir -p /mnt/ar18_usb
+echo "${ar18_sudo_password}" | sudo -Sk mount "/dev/${ar18_device}1" /mnt/ar18_usb
+echo "${ar18_sudo_password}" | sudo -Sk grub-install --target=i386-pc --debug --boot-directory=/mnt/ar18_usb/boot "/dev/${ar18_device}"
+echo "${ar18_sudo_password}" | sudo -Sk grub-mkconfig -o /mnt/ar18_usb/boot/grub/grub.cfg
+
+for filename in "/boot/"*; do
+  if [ "${filename}" = "/boot/grub" ]; then
+    continue
+  else  
+    echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${filename}" "/mnt/ar18_usb/"
+  fi
+done
 
 ##################################SCRIPT_END###################################
 # Restore old shell values
