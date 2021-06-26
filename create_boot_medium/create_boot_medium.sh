@@ -43,7 +43,9 @@ set +e
 echo "${ar18_sudo_password}" | sudo -Sk umount -R /mnt/ar18_usb
 set -e
 
+set +e
 echo 'type=83' | echo "${ar18_sudo_password}" | sudo -Sk sfdisk "/dev/${ar18_device}"
+set -e
 echo "${ar18_sudo_password}" | sudo -Sk mkfs.ext4 "/dev/${ar18_device}1"
 
 echo "${ar18_sudo_password}" | sudo -Sk  mkdir -p /mnt/ar18_usb
