@@ -66,7 +66,7 @@ chosen_image_basename="$(basename "${chosen_image}")"
 echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
 mkdir -p "/tmp/${chosen_image_basename}"
 echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_image}" "/tmp/${chosen_image_basename}/${chosen_image_basename}"
-echo "${ar18_sudo_password}" | sudo -Sk cd "/tmp/${chosen_image_basename}"
+cd "/tmp/${chosen_image_basename}"
 echo "${ar18_sudo_password}" | sudo -Sk zcat "/tmp/${chosen_image_basename}/${chosen_image_basename}" | cpio -idmv
 echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}/${chosen_image_basename}"
 for filename2 in "/tmp/${chosen_image_basename}/"*; do
