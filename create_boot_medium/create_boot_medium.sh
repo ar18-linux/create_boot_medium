@@ -34,6 +34,9 @@ set -eu
 
 if [ ! -v ar18_helper_functions ]; then rm -rf "/tmp/helper_functions_$(whoami)"; cd /tmp; git clone https://github.com/ar18-linux/helper_functions.git; mv "/tmp/helper_functions" "/tmp/helper_functions_$(whoami)"; . "/tmp/helper_functions_$(whoami)/helper_functions/helper_functions.sh"; cd "${script_dir}"; export ar18_helper_functions=1; fi
 obtain_sudo_password
+
+pacman_install cpio
+
 echo "" 
 read -p "specify device to use for boot (i.e. sdb): " ar18_device
 echo ""
@@ -50,16 +53,56 @@ echo "${ar18_sudo_password}" | sudo -Sk mkfs.ext4 "/dev/${ar18_device}1"
 
 echo "${ar18_sudo_password}" | sudo -Sk mkdir -p /mnt/ar18_usb
 echo "${ar18_sudo_password}" | sudo -Sk mount "/dev/${ar18_device}1" /mnt/ar18_usb
-echo "${ar18_sudo_password}" | sudo -Sk grub-install --target=i386-pc --debug --boot-directory=/mnt/ar18_usb/boot "/dev/${ar18_device}"
-echo "${ar18_sudo_password}" | sudo -Sk grub-mkconfig -o /mnt/ar18_usb/boot/grub/grub.cfg
+#echo "${ar18_sudo_password}" | sudo -Sk grub-install --target=i386-pc --debug --boot-directory=/mnt/ar18_usb/boot "/dev/${ar18_device}"
+#echo "${ar18_sudo_password}" | sudo -Sk grub-mkconfig -o /mnt/ar18_usb/boot/grub/grub.cfg
 
-for filename in "/boot/"*; do
-  if [ "${filename}" = "/boot/grub" ]; then
-    continue
-  else  
-    echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${filename}" "/mnt/ar18_usb/"
+echo "${ar18_sudo_password}" | sudo -Sk mkdir -p "/mnt/ar18_usb/boot"
+
+# Remove keyfiles
+chosen_image="$(ls -d1 /boot/* | grep initramfs | sort -r | head -1)"
+chosen_image_basename="$(basename "${chosen_image}")"
+echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
+echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_image}" "/tmp/${chosen_image_basename}/"
+echo "${ar18_sudo_password}" | sudo -Sk cd "/tmp/${chosen_image_basename}"
+echo "${ar18_sudo_password}" | sudo -Sk zcat "/tmp/${chosen_image_basename}/${chosen_image_basename}" | cpio -idmv
+echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}/${chosen_image_basename}"
+for filename2 in "/tmp/${chosen_image_basename}/"*; do
+  if [ "$(basename "${filename2}")" = "crypto_keyfile.bin" ]; then
+    echo "${ar18_sudo_password}" | sudo -Sk rm -rf "${filename2}"
   fi
 done
+find . | echo "${ar18_sudo_password}" | sudo -Sk cpio -H newc -o -R root:root | gzip -9 > "/mnt/ar18_usb/boot/${chosen_image_basename}" 
+echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
+
+chosen_kernel="$(ls -d1 /boot/* | grep vmlinuz | sort -r | head -1)"
+chosen_kernel_basename="$(basename "${chosen_kernel}")"
+echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_kernel}" "/mnt/ar18_usb/boot"
+
+for filename in "/boot/"*; do
+  base_name="$(basename "${filename}")"
+  if [ "${filename}" = "/boot/memtest86+" ]; then
+    continue
+  else
+    if [[ "${base_name}" =~ ^initramfs ]] \
+    || [[ "${base_name}" =~ ^vmlinuz ]]; then
+      continue
+    else
+      echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${filename}" "/mnt/ar18_usb/boot"
+    fi
+  fi
+done
+
+crypt_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda1 | cut -d ' ' -f2)"
+root_uuid="$(lsblk -l -o name,uuid,mountpoint | grep -E " /$" | xargs | cut -d ' ' -f1)"
+crypt_resume_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda2 | cut -d ' ' -f2)"
+
+echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${script_dir}/grub.cfg" "/mnt/ar18_usb/boot/grub/grub.cfg"
+
+echo "${ar18_sudo_password}" | sudo -Sk sed -i "s/{{CHOSEN_IMAGE}}/${chosen_image_basename}/g" "/mnt/ar18_usb/boot/grub/grub.cfg"
+echo "${ar18_sudo_password}" | sudo -Sk sed -i "s/{{CHOSEN_KERNEL}}/${chosen_kernel_basename}/g" "/mnt/ar18_usb/boot/grub/grub.cfg"
+echo "${ar18_sudo_password}" | sudo -Sk sed -i "s/{{CRYPT_UUID}}/${crypt_uuid}/g" "/mnt/ar18_usb/boot/grub/grub.cfg"
+echo "${ar18_sudo_password}" | sudo -Sk sed -i "s/{{ROOT_UUID}}/${root_uuid}/g" "/mnt/ar18_usb/boot/grub/grub.cfg"
+echo "${ar18_sudo_password}" | sudo -Sk sed -i "s/{{CRYPT_RESUME_UUID}}/${crypt_resume_uuid}/g" "/mnt/ar18_usb/boot/grub/grub.cfg"
 
 ##################################SCRIPT_END###################################
 # Restore old shell values
