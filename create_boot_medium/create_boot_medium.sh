@@ -79,7 +79,7 @@ echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
 
 chosen_kernel="$(ls -d1 /boot/* | grep vmlinuz | sort -r | head -1)"
 chosen_kernel_basename="$(basename "${chosen_kernel}")"
-echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_kernel}" "/mnt/ar18_usb/boot/${chosen_kernel}"
+echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_kernel}" "/mnt/ar18_usb/boot/${chosen_kernel_basename}"
 
 for filename in "/boot/"*; do
   base_name="$(basename "${filename}")"
