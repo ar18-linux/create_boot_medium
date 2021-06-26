@@ -39,8 +39,9 @@ read -p "specify device to use for boot (i.e. sdb): " ar18_device
 echo ""
 read -p "ALL DATA ON [${ar18_device}] WILL BE LOST! CONTINUE?"
 
+set +e
 echo "${ar18_sudo_password}" | sudo -Sk umount -R /mnt/ar18_usb
-
+set -e
 
 echo 'type=83' | echo "${ar18_sudo_password}" | sudo -Sk sfdisk "/dev/${ar18_device}"
 echo "${ar18_sudo_password}" | sudo -Sk mkfs.ext4 "/dev/${ar18_device}1"
