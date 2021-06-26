@@ -36,7 +36,7 @@ if [ ! -v ar18_helper_functions ]; then rm -rf "/tmp/helper_functions_$(whoami)"
 obtain_sudo_password
 
 read -p "specify device to use for boot (i.e. sdb): " ar18_device
-echo ""
+echo "saved"
 read -p "ALL DATA ON ${ar18_device} WILL BE LOST! CONTINUE?"
 
 
