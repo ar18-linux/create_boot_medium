@@ -95,9 +95,9 @@ for filename in "/boot/"*; do
   fi
 done
 
-crypt_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda1 | cut -d ' ' -f2)"
+crypt_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda1 | xargs | cut -d ' ' -f2)"
 root_uuid="$(lsblk -l -o name,uuid,mountpoint | grep -E " /$" | xargs | cut -d ' ' -f1)"
-crypt_resume_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda2 | cut -d ' ' -f2)"
+crypt_resume_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda2 | xargs | cut -d ' ' -f2)"
 
 echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${script_dir}/grub.cfg" "/mnt/ar18_usb/boot/grub/grub.cfg"
 
