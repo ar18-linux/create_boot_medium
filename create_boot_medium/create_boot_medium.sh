@@ -64,6 +64,7 @@ echo "${ar18_sudo_password}" | sudo -Sk mkdir -p "/mnt/ar18_usb/boot"
 chosen_image="$(ls -d1 /boot/* | grep initramfs | sort -r | head -1)"
 chosen_image_basename="$(basename "${chosen_image}")"
 echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
+mkdir -p "/tmp/${chosen_image_basename}"
 echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_image}" "/tmp/${chosen_image_basename}/${chosen_image_basename}"
 echo "${ar18_sudo_password}" | sudo -Sk cd "/tmp/${chosen_image_basename}"
 echo "${ar18_sudo_password}" | sudo -Sk zcat "/tmp/${chosen_image_basename}/${chosen_image_basename}" | cpio -idmv
