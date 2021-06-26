@@ -1,0 +1,5 @@
+module_name="create_boot_medium"
+
+if [ ! -v install_dir ]; then
+  install_dir="/opt/ar18"
+fi
