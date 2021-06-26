@@ -64,7 +64,7 @@ echo "${ar18_sudo_password}" | sudo -Sk mkdir -p "/mnt/ar18_usb/boot"
 chosen_image="$(ls -d1 /boot/* | grep initramfs | sort -r | head -1)"
 chosen_image_basename="$(basename "${chosen_image}")"
 echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
-echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_image}" "/tmp/${chosen_image_basename}/"
+echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_image}" "/tmp/${chosen_image_basename}/${chosen_image_basename}"
 echo "${ar18_sudo_password}" | sudo -Sk cd "/tmp/${chosen_image_basename}"
 echo "${ar18_sudo_password}" | sudo -Sk zcat "/tmp/${chosen_image_basename}/${chosen_image_basename}" | cpio -idmv
 echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}/${chosen_image_basename}"
@@ -78,7 +78,7 @@ echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
 
 chosen_kernel="$(ls -d1 /boot/* | grep vmlinuz | sort -r | head -1)"
 chosen_kernel_basename="$(basename "${chosen_kernel}")"
-echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_kernel}" "/mnt/ar18_usb/boot"
+echo "${ar18_sudo_password}" | sudo -Sk cp -rf "${chosen_kernel}" "/mnt/ar18_usb/boot/${chosen_kernel}"
 
 for filename in "/boot/"*; do
   base_name="$(basename "${filename}")"
