@@ -74,7 +74,7 @@ for filename2 in "/tmp/${chosen_image_basename}/"*; do
     echo "${ar18_sudo_password}" | sudo -Sk rm -rf "${filename2}"
   fi
 done
-find . | echo "${ar18_sudo_password}" | sudo -Sk cpio -H newc -o -R root:root | gzip -9 > "/mnt/ar18_usb/boot/${chosen_image_basename}" 
+find . | cpio -H newc -o -R root:root | echo "${ar18_sudo_password}" | sudo -Sk gzip -9 > "/mnt/ar18_usb/boot/${chosen_image_basename}" 
 echo "${ar18_sudo_password}" | sudo -Sk rm -rf "/tmp/${chosen_image_basename}"
 
 chosen_kernel="$(ls -d1 /boot/* | grep vmlinuz | sort -r | head -1)"
