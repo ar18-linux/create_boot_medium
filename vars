@@ -1,5 +1,8 @@
 module_name="create_boot_medium"
 
+if [ ! -v user_name ]; then
+  user_name="$(whoami)"
+fi
 if [ ! -v install_dir ]; then
   install_dir="/opt/ar18"
 fi
