@@ -77,8 +77,6 @@ ar18.script.execute_with_sudo mkfs.ext4 "/dev/${ar18_device}1"
 
 ar18.script.execute_with_sudo mkdir -p /mnt/ar18_usb
 ar18.script.execute_with_sudo mount "/dev/${ar18_device}1" /mnt/ar18_usb
-#echo "${ar18_sudo_password}" | sudo -Sk grub-install --target=i386-pc --debug --boot-directory=/mnt/ar18_usb/boot "/dev/${ar18_device}"
-#echo "${ar18_sudo_password}" | sudo -Sk grub-mkconfig -o /mnt/ar18_usb/boot/grub/grub.cfg
 
 ar18.script.execute_with_sudo mkdir -p "/mnt/ar18_usb/boot"
 
@@ -100,7 +98,7 @@ done
 # Compress new image
 ar18.script.execute_with_sudo sh -c "find . | cpio -H newc -o -R root:root | gzip -9 > \"/mnt/ar18_usb/boot/${chosen_image_basename}\""
 # Cleanup 
-#ar18.script.execute_with_sudo rm -rf "/tmp/${chosen_image_basename}"
+ar18.script.execute_with_sudo rm -rf "/tmp/${chosen_image_basename}"
 
 chosen_kernel="$(ls -d1 /boot/* | grep vmlinuz | sort -r | head -1)"
 chosen_kernel_basename="$(basename "${chosen_kernel}")"
@@ -123,7 +121,7 @@ done
 crypt_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda1 | xargs | cut -d ' ' -f2)"
 root_uuid="$(lsblk -l -o name,uuid,mountpoint | grep -E " /$" | xargs | cut -d ' ' -f1)"
 crypt_resume_uuid="$(lsblk -l -o name,uuid,mountpoint | grep sda2 | xargs | cut -d ' ' -f2)"
-
+cat "${script_dir}/grub.cfg"
 ar18.script.execute_with_sudo cp -rf "${script_dir}/grub.cfg" "/mnt/ar18_usb/boot/grub/grub.cfg"
 
 ar18.script.execute_with_sudo sed -i "s/{{CHOSEN_IMAGE}}/${chosen_image_basename}/g" "/mnt/ar18_usb/boot/grub/grub.cfg"
