@@ -98,7 +98,7 @@ for filename2 in "/tmp/${chosen_image_basename}/"*; do
   fi
 done
 ar18.script.execute_with_sudo sh -c "find . | cpio -H newc -o -R root:root | gzip -9 > \"/mnt/ar18_usb/boot/${chosen_image_basename}\"" 
-ar18.script.execute_with_sudo rm -rf "/tmp/${chosen_image_basename}"
+#ar18.script.execute_with_sudo rm -rf "/tmp/${chosen_image_basename}"
 
 chosen_kernel="$(ls -d1 /boot/* | grep vmlinuz | sort -r | head -1)"
 chosen_kernel_basename="$(basename "${chosen_kernel}")"
