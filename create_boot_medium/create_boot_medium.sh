@@ -127,6 +127,19 @@ for filename2 in "/tmp/${chosen_image_basename}/"*; do
     ar18.script.execute_with_sudo rm -rf "${filename2}"
   fi
 done
+# Change dropbear port
+if [ -f "/tmp/${chosen_image_basename}/hooks/dropbear" ]; then
+  if [ -f "/home/$(whoami)/.config/ar18/deploy/installed_target" ]; then
+    ar18_target="$(cat "/home/$(whoami)/.config/ar18/deploy/installed_target")"
+    if [ -f "/home/$(whoami)/.config/ar18/setup_dropbear/${ar18_target}" ]; then
+      . "/home/$(whoami)/.config/ar18/setup_dropbear/${ar18_target}"
+      if [ ! -v ar18_port ]; then
+        ar18_port="22"
+      fi
+      ar18.script.execute_with_sudo sed -i -E "s@/usr/sbin/dropbear -E -s -j -k@/usr/sbin/dropbear -E -s -j -k -p ${ar18_port}/g" "/tmp/${chosen_image_basename}/hooks/dropbear"
+    fi
+  fi
+fi
 # Compress new image
 ar18.script.execute_with_sudo sh -c "find . | cpio -H newc -o -R root:root | gzip -9 > \"/mnt/ar18_usb/boot/${chosen_image_basename}\""
 # Cleanup 
