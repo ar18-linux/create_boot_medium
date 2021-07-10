@@ -136,7 +136,7 @@ if [ -f "/tmp/${chosen_image_basename}/hooks/dropbear" ]; then
       if [ ! -v ar18_port ]; then
         ar18_port="22"
       fi
-      ar18.script.execute_with_sudo sed -i -E "s@/usr/sbin/dropbear -E -s -j -k@/usr/sbin/dropbear -E -s -j -k -p ${ar18_port}/g" "/tmp/${chosen_image_basename}/hooks/dropbear"
+      ar18.script.execute_with_sudo sed -i -E "s@/usr/sbin/dropbear -E -s -j -k@/usr/sbin/dropbear -E -s -j -k -p ${ar18_port}@g" "/tmp/${chosen_image_basename}/hooks/dropbear"
     fi
   fi
 fi
